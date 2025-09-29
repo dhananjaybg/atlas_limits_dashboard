@@ -13,13 +13,12 @@ A Django-based dashboard for monitoring MongoDB Atlas organizations, projects, a
 2. **Install Dependencies:**
    ```bash
    pip install -r requirements.txt
-   
    ```
 
 3. **Setup Environment Variables:**
    ```bash
    cp .env.example .env
-   # Edit .env with your Atlas API credentials
+   # Edit .env with your Atlas API credentials public key private key
    ```
 
 4. **Run Migrations:**
