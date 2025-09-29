@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB Atlas Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .metric-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .progress-bar-success { background-color: #28a745; }
+        .progress-bar-warning { background-color: #ffc107; }
+        .progress-bar-danger { background-color: #dc3545; }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .organization-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+        }
+        
+        .project-card {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        .project-header {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .loading-spinner {
+            display: none;
+        }
+        
+        .error-alert {
+            display: none;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .setup-instructions {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .credential-form {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="fas fa-database me-2"></i>MongoDB Atlas Dashboard
+            </span>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+
+        <!-- Credentials Form -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="credential-form">
+                    <h5 class="mb-3">
+                        <i class="fas fa-key me-2"></i>Enter Organization IDs
+                    </h5>
+                    <div class="mb-3">
+                        <label for="organizationId" class="form-label">Organization ID</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="organizationId" value="64ca747b952bcb462e491b03" placeholder="Enter Organization ID">
+                            <button class="btn btn-primary" type="button" onclick="launchdashboard()">
+                                <i class="fas fa-search me-1"></i>Load Dashboard
+                            </button>
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        Find your Organization ID in Atlas: Settings → Organization Settings → General
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="text-center loading-spinner" id="loadingSpinner">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Fetching data from MongoDB Atlas...</p>
+        </div>
+
+        <!-- Error Alert -->
+        <div class="alert alert-danger error-alert" id="errorAlert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span id="errorMessage"></span>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let dashboardData = null;
+        async function launchdashboard() {
+            const orgId = document.getElementById('organizationId').value.trim();
+            const publicKey = "" //document.getElementById('publicKey').value.trim();
+            const privateKey = "" //document.getElementById('privateKey').value.trim();
+            
+            if (!orgId) {
+                showError('Please enter an Organization ID');
+                return;
+            }
+            /*
+            if (!publicKey || !privateKey) {
+                showError('Please enter both Public Key and Private Key');
+                return;
+            }
+            */
+
+//https://cloud.mongodb.com/billing/payingOrg/linkableOrgView/6178074db1f2d87e98836e74
+
+
+            //ORG_IDS = ["5c54621b55385563b2506184", "5ea32987b69d7c0db7fa3268"];
+            ORG_IDS = ["5ea32987b69d7c0db7fa3268"];
+            //collect multiple org ids from comma separated input from the organizationId input field
+            //ORG_IDS = orgId.split(',').map(id => id.trim()).filter(id => id);
+            
+            ORG_IDS.forEach(id => {
+                fetchDashboardData(id);
+            });
+        }
+
+        async function fetchDashboardData(dash_id) {
+            const orgId = document.getElementById('organizationId').value.trim();
+            const publicKey = "" //document.getElementById('publicKey').value.trim();
+            const privateKey = "" //document.getElementById('privateKey').value.trim();
+            
+            if (!orgId) {
+                showError('Please enter an Organization ID');
+                return;
+            }
+            //dash_id = 'dashboardContent_' + orgId;
+            // generate div for dashboardContent using OrgId add style display none if not exists       
+            if (document.getElementById(dash_id)) {
+                //clean up previous content
+                document.getElementById(dash_id).innerHTML = '';    
+            } else {    
+                const dashboardDiv = document.createElement('div');
+                dashboardDiv.id = dash_id;
+                dashboardDiv.style.display = 'none';
+                document.body.appendChild(dashboardDiv);
+            }
+
+            showLoading(true);
+            hideError();
+            hideDashboard(dash_id);
+
+
+            try {
+                const response = await fetch('/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        organization_id: dash_id,
+                        public_key: publicKey,
+                        private_key: privateKey
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+
+                dashboardData = data;
+                renderDashboard(dash_id);
+                showDashboard(dash_id);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showError(`Failed to fetch data: ${error.message}`);
+            } finally {
+                showLoading(false);
+            }
+                
+        }   
+
+        function renderDashboard(dash_id) {
+            if (!dashboardData) return;
+
+            renderOrganizationHeader(dash_id);
+            renderOrganizationMetrics(dash_id);
+            renderProjects(dash_id);
+        }
+
+        function renderOrganizationHeader(dash_id) {
+            const org = dashboardData.organization;
+            //const container = document.getElementById('organizationHeader');
+
+            // instead of getting organizationHeader by id create it under dashboardContent
+            const header = document.createElement('div');
+            header.id = 'organizationHeader';
+            document.getElementById(dash_id).prepend(header);
+
+
+            header.innerHTML = `
+                <div class="organization-header text-center fade-in">
+                    <div class="container">
+                        <h1><i class="fas fa-building me-2"></i>${org.name}</h1>
+                        <p class="mb-0">5_Organization ID: ${org.id}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderOrganizationMetrics(dash_id) {
+            const metrics = dashboardData.metrics;
+            //const container = document.getElementById('organizationMetrics');
+            
+            const container = document.createElement('div');
+            container.id = 'organizationMetrics';
+            container.className = 'row mb-4';
+            document.getElementById(dash_id).appendChild(container);
+            
+
+            let html = '';
+            
+            if (metrics.total_projects !== undefined) {
+                html += createMetricCard('Projects', metrics.total_projects, 'fas fa-project-diagram', 'primary');
+            }
+            
+            if (metrics.total_clusters !== undefined) {
+                html += createMetricCard('Total Clusters', metrics.total_clusters, 'fas fa-server', 'success');
+            }
+            
+            if (metrics.total_users !== undefined) {
+                html += createMetricCard('Total Users', metrics.total_users, 'fas fa-users', 'info');
+            }
+
+            container.innerHTML = html;
+        }
+
+
+        function createMetricCard(title, value, icon, color) {
+            return `
+                <div class="col-md-3 mb-3">
+                    <div class="card metric-card h-100 border-${color} fade-in">
+                        <div class="card-body text-center">
+                            <i class="${icon} fa-2x text-${color} mb-2"></i>
+                            <h3 class="card-title text-${color}">${value}</h3>
+                            <p class="card-text">${title}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProjects(dash_id) {
+            const projects = dashboardData.projects || [];
+            
+            const section = document.createElement('div');
+            section.id = 'projectsSection';
+            document.getElementById(dash_id).appendChild(section);   
+            section.innerHTML = `
+                <h3 class="mb-3">
+                    <i class="fas fa-project-diagram me-2"></i>Projects
+                </h3>
+            `;    
+            const container = document.createElement('div');
+            container.id = 'projectsList';
+            section.appendChild(container);
+
+            
+            if (projects.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">No projects found</h4>
+                        <p class="text-muted">No projects are available for this organization.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            projects.forEach((project, index) => {
+                html += `
+                    <div class="project-card fade-in" style="animation-delay: ${index * 0.1}s">
+                        <div class="project-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-folder me-2"></i>${project.name}
+                                <small class="text-muted ms-2">(${project.id})</small>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            ${renderProjectMetrics(project)}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderProjectMetrics(project) {
+            let html = '<div class="row">';
+            console.log(project);
+            // write  a loop to go thru all the items under project group metrics with same prefix in sets of 3 ending in _count ,_limit, _perfectage create a card for each set of 3 items
+            for (const key in project) {
+                if (project.hasOwnProperty(key)) { // Ensures only own properties are considered
+                    if (key.endsWith('_count')) {
+                        const baseKey = key.slice(0, -6); // Remove '_count'
+                        const limitKey = `${baseKey}_limit`;
+                        const percentageKey = `${baseKey}_percentage`;
+                        const defaultKey = `${baseKey}_default`;
+
+                        // Check if all three keys exist
+                        if (project[limitKey] !== undefined && project[percentageKey] !== undefined) {
+                            html += createProjectMetric(
+                                baseKey.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                                project[key],
+                                project[limitKey],
+                                project[percentageKey],
+                                getStatusColor(project[percentageKey]),
+                                project[defaultKey]
+                            );
+                        }
+                    }
+                }
+            }
+            /*
+            // Database Users
+            if (project.database_users_count !== undefined) {
+                html += createProjectMetric(
+                    'Database Users--',
+                    project.database_users_count,
+                    project.database_users_limit,
+                    project.database_users_percentage,
+                    getStatusColor(project.database_users_percentage)
+                );
+            }
+
+            // Database Roles
+            if (project.database_roles_count !== undefined) {
+                html += createProjectMetric(
+                    'Database Roles--',
+                    project.database_roles_count,
+                    project.database_roles_limit,
+                    project.database_roles_percentage,
+                    getStatusColor(project.database_roles_percentage)
+                );
+            }
+        
+            // Clusters
+            if (project.clusters_count !== undefined) {
+                html += createProjectMetric(
+                    'Clusters-dh-',
+                    project.clusters_count,
+                    project.clusters_limit,
+                    project.clusters_percentage,
+                    getStatusColor(project.clusters_percentage)
+                );
+            }
+            */
+            // Network Access
+            if (project.network_access_count !== undefined) {
+                html += createProjectMetric(
+                    'Network Access Entries',
+                    project.network_access_count,
+                    project.network_access_limit,
+                    project.network_access_percentage,
+                    getStatusColor(project.network_access_percentage)
+                );
+            }
+
+            // API Keys
+            if (project.api_keys_count !== undefined) {
+                html += createProjectMetric(
+                    'API Keys',
+                    project.api_keys_count,
+                    project.api_keys_limit,
+                    project.api_keys_percentage,
+                    getStatusColor(project.api_keys_percentage)
+                );
+            }
+
+            // Alerts
+            if (project.alerts_count !== undefined) {
+                html += `
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Active Alerts</h6>
+                                <h4 class="text-warning">
+                                    <i class="fas fa-bell me-1"></i>${project.alerts_count}
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        function createProjectMetric(title, current, limit, percentage, status, defaultLimit) {
+            const progressClass = `progress-bar-${status}`;
+            
+            return `
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">${title}</h6>
+                            <h4 class="card-title">
+                                ${current} / ${limit}
+                                <span class="status-badge badge bg-${status} ms-2">
+                                    ${percentage.toFixed(1)}%
+                                </span>
+                            </h4>    
+                            <span class="text-muted ms-2">
+                                (${defaultLimit})
+                            </span>
+                            <div class="progress mt-2" style="height: 6px;">
+                                <div class="progress-bar ${progressClass}" 
+                                     style="width: ${Math.min(percentage, 100)}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getStatusColor(percentage) {
+            if (percentage >= 90) return 'danger';
+            if (percentage >= 80) return 'warning';
+            return 'success';
+        }
+
+        function showLoading(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            const alert = document.getElementById('errorAlert');
+            const messageEl = document.getElementById('errorMessage');
+            messageEl.textContent = message;
+            alert.style.display = 'block';
+        }
+
+        function hideError() {
+            const alert = document.getElementById('errorAlert');
+            alert.style.display = 'none';
+        }
+
+        function showDashboard( dash_id ) {
+            const dashboard = document.getElementById(dash_id);
+            dashboard.style.display = 'block';
+        }
+
+        function hideDashboard( dash_id ) {
+            const dashboard = document.getElementById(dash_id);
+            dashboard.style.display = 'none';
+        }
+
+        // Allow Enter key to submit
+        ['organizationId', 'publicKey', 'privateKey'].forEach(id => {
+            document.getElementById(id).addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    fetchDashboardData();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

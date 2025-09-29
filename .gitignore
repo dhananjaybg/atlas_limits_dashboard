@@ -1,0 +1,11 @@
+.vscode/*
+__pycache__/*
+atlas_dashboard/atlas_dashboard/__pycache__/*
+atlas_dashboard/__pycache__/*
+script-and-snippets/*
+dashboard/test_auth.py
+venv/*
+.env
+setup.sh
+.DS_Store
+atlas_dashboard.log
