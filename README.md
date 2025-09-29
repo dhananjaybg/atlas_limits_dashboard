@@ -8,11 +8,13 @@ A Django-based dashboard for monitoring MongoDB Atlas organizations, projects, a
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # On macOS/Linux
+   
    ```
 
 2. **Install Dependencies:**
    ```bash
    pip install -r requirements.txt
+
    ```
 
 3. **Setup Environment Variables:**
