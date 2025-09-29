@@ -150,9 +150,9 @@
             */
 
             //ORG_IDS = ["5c54621b55385563b2506184", "5ea32987b69d7c0db7fa3268"];
-            ORG_IDS = ["5ea32987b69d7c0db7fa3268"];
+            //ORG_IDS = ["5ea32987b69d7c0db7fa3268"];
             //collect multiple org ids from comma separated input from the organizationId input field
-            //ORG_IDS = orgId.split(',').map(id => id.trim()).filter(id => id);
+            ORG_IDS = orgId.split(',').map(id => id.trim()).filter(id => id);
             
             ORG_IDS.forEach(id => {
                 fetchDashboardData(id);
