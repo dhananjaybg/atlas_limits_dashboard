@@ -1,7 +1,6 @@
 .vscode/*
 __pycache__/*
-atlas_dashboard/atlas_dashboard/__pycache__/*
-atlas_dashboard/__pycache__/*
+dashboard/__pycache__/*
 scripts-and-snippets/*
 dashboard/test_auth.py
 venv/*

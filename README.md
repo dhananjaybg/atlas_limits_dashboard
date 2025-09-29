@@ -13,6 +13,7 @@ A Django-based dashboard for monitoring MongoDB Atlas organizations, projects, a
 2. **Install Dependencies:**
    ```bash
    pip install -r requirements.txt
+   
    ```
 
 3. **Setup Environment Variables:**
