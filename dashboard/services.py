@@ -118,7 +118,7 @@ class DashboardService:
                 #clusters = self.atlas_client.get_project_clusters(project_id)
                 metrics['clusters_count'] = clusters
                 metrics['clusters_limit'] = DEFAULT_LIMITS['numClusters']
-                metrics['clusters_percentage'] = clusters/ 25 * 100
+                metrics['clusters_percentage'] = clusters/ DEFAULT_LIMITS['numClusters'] * 100
 
 
             # Add status indicators
