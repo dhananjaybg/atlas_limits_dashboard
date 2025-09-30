@@ -91,23 +91,7 @@ class DashboardService:
         }
 
         try:
-            # Get various project resources based on configuration
-            ## if self.config['project_metrics']['database_users']:
-            ##     users = self.atlas_client.get_project_database_users(project_id)
-            ##     metrics['database_users_count'] = len(users)
-            ##     metrics['database_users_limit'] = DEFAULT_LIMITS['database_users_per_project']
-            ##     metrics['database_users_percentage'] = (
-            ##         len(users) / DEFAULT_LIMITS['database_users_per_project'] * 100
-            ##     )
-                
-            ## if self.config['project_metrics']['database_roles']:
-            ##     roles = self.atlas_client.get_project_custom_roles(project_id)
-            ##     metrics['database_roles_count'] = len(roles)
-            ##     metrics['database_roles_limit'] = DEFAULT_LIMITS['database_roles_per_project']
-            ##     metrics['database_roles_percentage'] = (
-            ##         len(roles) / DEFAULT_LIMITS['database_roles_per_project'] * 100
-            ##     )
-                
+         
             if self.config['project_metrics']['project_limits']:
                 limits = self.atlas_client.get_project_limits(project_id)
                 #logger.info(f"Project Limits data: {limits}")
@@ -129,35 +113,13 @@ class DashboardService:
                             )
                         else:
                             metrics[f"{key}_percentage"] = 0 # Avoid division by zero 
-        
-
+                    
             if self.config['project_metrics']['clusters']:
                 #clusters = self.atlas_client.get_project_clusters(project_id)
                 metrics['clusters_count'] = clusters
-                metrics['clusters_limit'] = DEFAULT_LIMITS['clusters']
-                metrics['clusters_percentage'] = (
-                    clusters / DEFAULT_LIMITS['clusters_per_project'] * 100
-                )
-#
-            #if self.config['project_metrics']['network_access']:
-            #    network_entries = self.atlas_client.get_project_network_access(project_id)
-            #    metrics['network_access_count'] = len(network_entries)
-            #    metrics['network_access_limit'] = DEFAULT_LIMITS['network_access_entries']
-            #    metrics['network_access_percentage'] = (
-            #        len(network_entries) / DEFAULT_LIMITS['network_access_entries'] * 100
-            #    )
-#
-            #if self.config['project_metrics']['api_keys']:
-            #    api_keys = self.atlas_client.get_project_api_keys(project_id)
-            #    metrics['api_keys_count'] = len(api_keys)
-            #    metrics['api_keys_limit'] = DEFAULT_LIMITS['api_keys_per_project']
-            #    metrics['api_keys_percentage'] = (
-            #        len(api_keys) / DEFAULT_LIMITS['api_keys_per_project'] * 100
-            #    )
-#
-            #if self.config['project_metrics']['alerts']:
-            #    alerts = self.atlas_client.get_project_alerts(project_id)
-            #    metrics['alerts_count'] = len(alerts)
+                metrics['clusters_limit'] = DEFAULT_LIMITS['numClusters']
+                metrics['clusters_percentage'] = clusters/ 25 * 100
+
 
             # Add status indicators
             metrics['status_indicators'] = self._get_status_indicators(metrics)

@@ -27,8 +27,8 @@ class MongoDBAtlasClient:
         else:
             logger.error(" Authentication keys not provided, attempting cookie-based auth")
             profile = Profile(name="myprofile", cookiejar_path="/Users/dhananjay.ghevde/mdbcookie.pickle")
-            #self.auth = EmployeeAtlasCookieAuth(profile)
-            self.auth = AtlasCookieAuth(profile)    
+            self.auth = EmployeeAtlasCookieAuth(profile)
+            #self.auth = AtlasCookieAuth(profile)    
             self.profile = profile
 
             ## https://cloud.mongodb.com/billing/payingOrg/linkableOrgs/6178074db1f2d87e98836e74
