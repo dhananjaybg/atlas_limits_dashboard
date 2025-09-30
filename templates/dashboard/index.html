@@ -148,10 +148,7 @@
                 return;
             }
             */
-
             //ORG_IDS = ["5c54621b55385563b2506184", "5ea32987b69d7c0db7fa3268"];
-            //ORG_IDS = ["5ea32987b69d7c0db7fa3268"];
-            //collect multiple org ids from comma separated input from the organizationId input field
             ORG_IDS = orgId.split(',').map(id => id.trim()).filter(id => id);
             
             ORG_IDS.forEach(id => {
@@ -168,8 +165,6 @@
                 showError('Please enter an Organization ID');
                 return;
             }
-            //dash_id = 'dashboardContent_' + orgId;
-            // generate div for dashboardContent using OrgId add style display none if not exists       
             if (document.getElementById(dash_id)) {
                 //clean up previous content
                 document.getElementById(dash_id).innerHTML = '';    
@@ -229,7 +224,6 @@
         function renderOrganizationHeader(dash_id) {
             const org = dashboardData.organization;
             //const container = document.getElementById('organizationHeader');
-
             // instead of getting organizationHeader by id create it under dashboardContent
             const header = document.createElement('div');
             header.id = 'organizationHeader';
@@ -361,40 +355,6 @@
                     }
                 }
             }
-            /*
-            // Database Users
-            if (project.database_users_count !== undefined) {
-                html += createProjectMetric(
-                    'Database Users--',
-                    project.database_users_count,
-                    project.database_users_limit,
-                    project.database_users_percentage,
-                    getStatusColor(project.database_users_percentage)
-                );
-            }
-
-            // Database Roles
-            if (project.database_roles_count !== undefined) {
-                html += createProjectMetric(
-                    'Database Roles--',
-                    project.database_roles_count,
-                    project.database_roles_limit,
-                    project.database_roles_percentage,
-                    getStatusColor(project.database_roles_percentage)
-                );
-            }
-        
-            // Clusters
-            if (project.clusters_count !== undefined) {
-                html += createProjectMetric(
-                    'Clusters-dh-',
-                    project.clusters_count,
-                    project.clusters_limit,
-                    project.clusters_percentage,
-                    getStatusColor(project.clusters_percentage)
-                );
-            }
-            */
             // Network Access
             if (project.network_access_count !== undefined) {
                 html += createProjectMetric(
