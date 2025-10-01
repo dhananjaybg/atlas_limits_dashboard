@@ -9,3 +9,4 @@ venv/*
 setup.sh
 .DS_Store
 atlas_dashboard.log
+mdbcookie.pickle
