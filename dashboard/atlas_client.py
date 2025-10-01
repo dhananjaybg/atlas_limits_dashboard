@@ -52,11 +52,17 @@ class MongoDBAtlasClient:
             ## else:
             ##     logger.error("Dhananjy _INIT_ Auth Success")
             ##     # Test the authentication by making a simple request
-            ## test_response = requests.get("https://cloud.mongodb.com/orgs/64ca747b952bcb462e491b03", auth=self.auth)
+
             test_response = requests.get(
-                "https://cloud.mongodb.com/billing/payingOrg/6178074db1f2d87e98836e74/linked",
+                "https://cloud.mongodb.com/admin/nds/orgs/64ca747b952bcb462e491b03/limits",
                 auth=self.auth,
             )
+
+            test_response = requests.get(
+                "https://cloud.mongodb.com/orgs/64ca747b952bcb462e491b03",
+                auth=self.auth,
+            )
+            ## test_response = requests.get("https://cloud.mongodb.com/billing/payingOrg/6178074db1f2d87e98836e74/linked", auth=self.auth)
             if test_response.status_code != 200:
                 logger.error("MongoDB Atlas API authentication failed")
                 self.auth = None
@@ -64,12 +70,12 @@ class MongoDBAtlasClient:
                 logger.info(
                     "\n\n -->> MongoDB Atlas API authentication mmeded  succeeded"
                 )
-                # logger.info(f"Test Response: {test_response.json()}")
+                logger.info(f"Test Response: {test_response.json()}")
                 # iterate thru all the json sub documents and  extract the org ids
-                org_ids = []
-                for org in test_response.json():
-                    org_ids.append(org["orgId"])
-                logger.info(f"Collected Org IDs: {org_ids}")
+                ## org_ids = []
+                ## for org in test_response.json():
+                ##     org_ids.append(org['orgId'])
+                ## logger.info(f"Collected Org IDs: {org_ids}")
 
     def _make_request(self, endpoint: str) -> Optional[Dict]:
         """Make authenticated request to MongoDB Atlas API"""

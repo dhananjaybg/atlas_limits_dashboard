@@ -2,7 +2,7 @@
 
 A Django-based dashboard for monitoring MongoDB Atlas organizations, projects, and resources.
 
-## Quick Start
+## Setup
 
 1. **Setup Virtual Environment:**
    ```bash
@@ -22,12 +22,6 @@ A Django-based dashboard for monitoring MongoDB Atlas organizations, projects, a
    cp .env.example .env
    # Edit .env with your Atlas API credentials public key private key
    ```
-
-4. **Run Migrations:**
-   ```bash
-   python manage.py migrate
-   ```
-
 4. **Install scripts-and snippets :**
    ```bash
    git clone https://github.com/10gen/scripts-and-snippets.git
@@ -36,13 +30,31 @@ A Django-based dashboard for monitoring MongoDB Atlas organizations, projects, a
 
    ```
 
-5. **Start Server:**
-   ```bash
-   python manage.py runserver
-   ```
+## Quick Start
 
-6. **Access Dashboard:**
+1. **Make /update cookie:**
+   ```bash
+   python3 make_cookie.py 
+   ```
+   - This is temp step which will go away while we fix cookies creation.
+   - New browser window will be launched asking for login details.
+   - This cookie ("mdbcookie.pickle") file is good for few hours 
+   - to avoid stake cookies delete "mdbcookie.pickle" if it exists in the atlas_dashboard folder
+
+2. **Start Server:**
+   ```bash
+   cd atlas_dashboard
+   python manage.py runserver
+
+
+3. **Access Dashboard:**
+   ```
    Open http://localhost:8000 in your browser
+   ```
+   - Enter the Org Id or OrdId's comma seperated.
+   - Clicking the "Load Dashboard" button will use the cookie in your local directory to connect to Atlas.
+   
+
 
 ## Configuration
 
@@ -71,6 +83,7 @@ Edit `driver_config.py` to customize which metrics are displayed:
 
 ## Troubleshooting
 
+- Check if the mongodb.pickle file gets created in the localy
 - Check .env file for correct API credentials
 - Ensure API key has proper permissions
 - Check console/logs for detailed error messages
