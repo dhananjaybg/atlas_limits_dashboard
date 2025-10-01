@@ -9,4 +9,4 @@ if __name__ == "__main__":
     result = atlas.get(f"https://cloud.mongodb.com/orgs/64ca747b952bcb462e491b03/groups").json()
     print("Done retrieving projects: ")
 
-    print("Cookie jar saved to /Users/dhananjay.ghevde/mdbcookie.pickle")
+    print("Cookie jar saved to atlas_dashboard/mdbcookie.pickle")
