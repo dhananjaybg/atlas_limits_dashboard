@@ -22,12 +22,6 @@ A Django-based dashboard for monitoring MongoDB Atlas organizations, projects, a
    cp .env.example .env
    # Edit .env with your Atlas API credentials public key private key
    ```
-
-4. **Run Migrations:**
-   ```bash
-   python manage.py migrate
-   ```
-
 4. **Install scripts-and snippets :**
    ```bash
    git clone https://github.com/10gen/scripts-and-snippets.git
